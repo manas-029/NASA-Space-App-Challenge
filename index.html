@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission Architect: Rescue, Review &amp; Flight Operations</title>
+<meta name="description" content="Master spacecraft systems engineering through real-world NASA crises and design defense reviews.">
+<style>
+:root{--bg:#070d17;--card:#0e1a2b;--hover:#14253e;--sel:#1b3252;--surf:#132238;--bd:#223c60;--text:#e2e8f0;--mut:#8ba2c0;--cy:#38bdf8;--ok:#34d399;--warn:#fbbf24;--bad:#f87171;--mono:'SF Mono',Monaco,Consolas,'Courier New',monospace;--disp:Georgia,Cambria,serif;color-scheme:dark}
+:root[data-theme=light]{--bg:#f0f4f9;--card:#fff;--hover:#f1f6fc;--sel:#e1effa;--surf:#e5edf7;--bd:#b8cde3;--text:#0f172a;--mut:#475569;--cy:#0284c7;--ok:#059669;--warn:#d97706;--bad:#dc2626;color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.5;min-height:100vh;padding:env(safe-area-inset-top,0) 0 calc(40px + env(safe-area-inset-bottom,0));overflow-x:hidden}
+.wrap{max-width:840px;margin:0 auto;padding:18px 16px}
+.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bd);padding-bottom:12px;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:0;color:inherit;font:inherit;text-align:left}
+.brand svg{width:32px;height:32px;fill:var(--cy)}
+.bt{font:11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.bn{font-size:16px;font-weight:700;letter-spacing:.05em}
+.ctrl{background:var(--surf);color:var(--text);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;font:12px var(--mono);cursor:pointer;margin-left:6px}
+.ctrl:hover{border-color:var(--cy)}
+h1{font:700 30px/1.2 var(--disp);margin-bottom:8px}
+h2{font:600 22px var(--disp);margin-bottom:8px}
+.lead{color:var(--mut);font-size:15px;margin-bottom:20px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 24px}
+@media(max-width:640px){.grid4{grid-template-columns:repeat(2,1fr)}}
+.gauge{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:10px 12px}
+.gauge.crit{border-color:var(--bad)}
+.gh{display:flex;justify-content:space-between;align-items:baseline}
+.gl{font:11px var(--mono);text-transform:uppercase;color:var(--mut)}
+.gv{font:700 14px var(--mono)}
+.barbg{height:6px;background:var(--surf);border-radius:3px;overflow:hidden;margin-top:4px}
+.bar{height:100%;background:var(--cy);transition:width .4s}
+.bar.warn{background:var(--warn)}.bar.crit{background:var(--bad)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:18px}
+.tag{display:inline-flex;align-items:center;gap:6px;font:700 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--cy);margin-bottom:8px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.choice{display:flex;width:100%;text-align:left;background:var(--surf);color:var(--text);border:1.5px solid var(--bd);border-radius:10px;padding:14px 16px;margin:10px 0;font:inherit;font-size:15px;cursor:pointer;gap:12px;position:relative}
+.choice:hover:not(:disabled){border-color:var(--cy);background:var(--hover)}
+.choice:focus-visible,.btn:focus-visible,.ctrl:focus-visible,.mode:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.choice:disabled{opacity:.65;cursor:default}
+.choice.selected{border-color:var(--cy);background:var(--sel);opacity:1;padding-top:26px}
+.choice.selected::before{content:"SELECTED";position:absolute;top:6px;right:12px;font:700 9px var(--mono);letter-spacing:.1em;color:var(--cy)}
+.key{font:12px var(--mono);background:var(--bd);padding:2px 7px;border-radius:4px;height:fit-content}
+.btn{display:block;width:100%;background:var(--cy);color:#041221;font-weight:700;border:0;border-radius:10px;padding:14px 16px;font-size:15px;cursor:pointer;margin-top:14px}
+.btn:hover{filter:brightness(1.15)}
+.btn.sec{background:var(--surf);color:var(--text);border:1px solid var(--bd);font-weight:400}
+.fb{border-left:4px solid var(--warn);padding:14px 16px;margin:16px 0;background:var(--surf);border-radius:0 10px 10px 0;font-size:14.5px}
+.fb.good{border-color:var(--ok)}.fb.bad{border-color:var(--bad)}
+.ft{font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;color:var(--warn)}
+.fb.good .ft{color:var(--ok)}.fb.bad .ft{color:var(--bad)}
+.chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.chip{font:700 11px var(--mono);padding:2px 7px;border-radius:4px;border:1px solid}
+.chip.pos{color:var(--ok);border-color:var(--ok)}.chip.neg{color:var(--bad);border-color:var(--bad)}.chip.mid{color:var(--warn);border-color:var(--warn)}
+.hero{text-align:center;padding:24px 0 16px}
+.big{font:700 64px/1 var(--disp);margin-bottom:6px}
+.rate{font:13px var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--mut)}
+.who{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.av{width:44px;height:44px;border-radius:8px;background:var(--surf);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font:700 12px var(--mono);color:var(--cy)}
+.list{list-style:none;margin:14px 0}
+.list li{padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px;display:flex;gap:10px}
+.list li::before{content:"✦";color:var(--cy)}
+.modes{display:grid;grid-template-columns:1fr;gap:16px;margin-top:14px}
+@media(min-width:600px){.modes{grid-template-columns:1fr 1fr}}
+.mode{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;cursor:pointer;color:inherit;font:inherit;text-align:left;display:flex;flex-direction:column;justify-content:space-between}
+.mode:hover{border-color:var(--cy)}
+.hud{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--surf);border-radius:6px;padding:6px 12px;font:11px var(--mono);color:var(--mut);margin-bottom:12px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <button class="brand" id="home" title="Main menu">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L1 21h22L12 2zm0 3.8L19.2 19H4.8L12 5.8zM11 10v4h2v-4h-2zm0 5v2h2v-2h-2z"/></svg>
+    <span><span class="bt" style="display:block">NASA // Systems Engineering</span><span class="bn">Mission Architect</span></span>
+  </button>
+  <div>
+    <button class="ctrl" id="bAudio">🔊 COMMS ON</button><button class="ctrl" id="bTheme">◐ THEME</button><button class="ctrl" id="bLogs">📜 LOGS</button>
+  </div>
+</header>
+<main id="app" aria-live="polite"></main>
+</div>
+<script>
+"use strict";
+/* ---------- Sound (Web Audio, no assets) ---------- */
+const audio = {
+  ctx: null, on: true,
+  init() {
+    try {
+      if (!this.ctx) { const A = window.AudioContext || window.webkitAudioContext; if (A) this.ctx = new A(); }
+      if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    } catch (e) {}
+  },
+  tone(type, f0, f1, dur, vol, delay = 0) {
+    if (!this.on || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime + delay, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+      o.type = type; o.frequency.setValueAtTime(f0, t);
+      if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t + dur);
+    } catch (e) {}
+  },
+  quindar(i = true) { this.tone('sine', i ? 2525 : 2475, i ? 2525 : 2475, .22, .035); },
+  click() { this.tone('triangle', 600, 1200, .04, .04); },
+  chime() { [523.25, 659.25, 783.99].forEach((f, i) => this.tone('sine', f, f, .32, .03, i * .08)); },
+  alarm() { this.tone('sawtooth', 900, 350, .2, .05); },
+  failure() { this.tone('sawtooth', 180, 45, .6, .07); }
+};
+
+const MET = {
+  pw: { name: 'Power Bus', icon: '⚡' }, dt: { name: 'Comm Link', icon: '📡' },
+  tm: { name: 'Timeline', icon: '⏱' }, hl: { name: 'Craft Health', icon: '🛡' }
+};
+const START = 75; // starting level: leaves room for gains to show and losses to hurt
+
+const SCENARIOS = [
+{ t:'Cryogenic Tank Rupture', real:'Inspired by Apollo 13 (1970)', des:'MISSION CRITICAL // SM-O2 FAILURE',
+  s:'An oxygen tank has ruptured in the Service Module. Fuel cells are dying, main power is draining, and the Command Module will run dead days before Earth re-entry.',
+  steps:[
+  { q:'Main bus B voltage is collapsing. What is your immediate load-shedding protocol?', o:[
+    { t:'Execute aggressive stepwise load-shedding; power down all non-essential telemetry and equipment immediately.', fx:{pw:15,tm:-5}, g:1, fb:'Optimal. Flight controllers cut loads to a bare minimum (~12 amps). Every watt saved bought hours of battery life before re-entry.' },
+    { t:'Keep systems online and attempt repeated valve cycling to isolate the rupture.', fx:{pw:-40,tm:-10,hl:-10}, g:0, fb:'Critical error. The tank failure was catastrophic and unrepairable. Running diagnostics doubled the battery drain.' },
+    { t:'Instantly cut all spacecraft power including the primary guidance computer.', fx:{pw:10,hl:-30,tm:-5}, g:0, fb:'Dangerous over-correction. A cold shutdown risked platform misalignment and condensation freezing inside the avionics.' } ] },
+  { q:'How do you preserve life support and trajectory for Earth return?', o:[
+    { t:'Repurpose the Lunar Module (Aquarius) as a lifeboat and fly a free-return lunar trajectory.', fx:{pw:15,tm:10,hl:5}, g:1, fb:'Classic systems engineering. Aquarius had its own batteries, water, and oxygen; reusing surviving modules got the crew home.' },
+    { t:'Ignite the damaged Service Propulsion System (SPS) for an immediate direct abort.', fx:{hl:-45,pw:-25}, g:0, fb:'Catastrophic risk. Flight Director Gene Kranz refused because the damage to the engine and nozzle was unknown.' },
+    { t:'Loiter in translunar coast while Houston runs hundreds of simulator trials for a perfect profile.', fx:{tm:-35,pw:-20}, g:0, fb:'Timeline exhaustion. Consumables (CO2 scrubbers, cooling water) were running dry. Action cannot wait for perfection.' } ] } ] },
+{ t:'Spherical Aberration Flaw', real:'Inspired by the Hubble Space Telescope (1990)', des:'PAYLOAD CALIBRATION // PRIMARY OPTIC',
+  s:'First-light images reveal severe spherical aberration. A null corrector was miscalibrated; the 2.4-meter primary mirror edge is ground about 2.2 microns too flat.',
+  steps:[
+  { q:'The telescope is already in orbit. How do you resolve the optical distortion?', o:[
+    { t:'Design a corrective optics package (COSTAR) with inverse-aberration mirrors for a Shuttle servicing EVA.', fx:{dt:15,tm:-15,hl:10}, g:1, fb:'The actual solution. Small mirrors with equal and opposite aberration restored full resolution without replacing the primary.' },
+    { t:'De-orbit the observatory and build an entirely new telescope from scratch.', fx:{tm:-50,pw:-15}, g:0, fb:'Program killer. Hubble took decades and billions of dollars; scrapping it instead of fixing the optical path would have ended the program.' },
+    { t:'Accept the blur and restrict the mission to nearby planets only.', fx:{dt:-30,hl:-10}, g:0, fb:'Defeatist engineering. Nearby planetary science does not meet the deep-cosmos science requirements.' } ] },
+  { q:'During the 3-year wait for the servicing mission, how do you sustain science return?', o:[
+    { t:'Use digital image deconvolution and prioritize bright, high-contrast targets.', fx:{dt:25,tm:5}, g:1, fb:'Superb trade-off. Software processing recovered significant science until astronauts arrived.' },
+    { t:'Power down all science instruments and safe the spacecraft to minimize wear.', fx:{dt:-15,tm:-15}, g:0, fb:'Costly inaction. An idle observatory burns funds with zero science return.' },
+    { t:'Attempt long-exposure imaging of the faintest deep-field galaxies immediately.', fx:{dt:-20,pw:-10}, g:0, fb:'Misallocated time. Faint halos wash into noise without sharp focus. Match goals to what the sensor can do.' } ] } ] },
+{ t:'High-Gain Antenna Jam', real:'Inspired by Galileo (1991)', des:'LINK COLLAPSE // JUPITER EN ROUTE',
+  s:'En route to Jupiter, the 4.8-meter high-gain umbrella antenna failed to open. Rib pins are stuck; telemetry collapsed from ~134,000 bps to roughly 10 bps.',
+  steps:[
+  { q:'You are hundreds of millions of kilometers from Earth. How do you recover communications?', o:[
+    { t:'Use the Low-Gain Antenna and uplink new flight software with onboard data compression.', fx:{dt:20,pw:5}, g:1, fb:'Brilliant rescue. Engineers rewrote onboard software and added compression, which saved the mission.' },
+    { t:'Drive the deployment motors at maximum voltage while firing thrusters to shake the probe.', fx:{pw:-30,hl:-25}, g:0, fb:'Structural hazard. JPL tried gentle thermal cycling and motor pulses; brute force risked damaging the spacecraft.' },
+    { t:'Abandon the high-bandwidth science instruments and downgrade to a solar monitor.', fx:{dt:-45,tm:-10}, g:0, fb:'Premature surrender. Deep-space probes have backup paths that ground-side signal processing can exploit.' } ] },
+  { q:'With bandwidth reduced to a trickle, how do you prioritize science downlink?', o:[
+    { t:'Strict triage: buffer high-priority data on the tape recorder and downlink summary packets first.', fx:{dt:20,tm:5}, g:1, fb:'Precise telemetry management. Prioritizing essential science let Galileo find evidence of Europa’s subsurface ocean.' },
+    { t:'Downlink data in simple chronological order as acquired.', fx:{dt:-20,tm:-15}, g:0, fb:'Buffer overflow. Low-value data filled the queue and delayed critical flyby observations.' },
+    { t:'Downlink full uncompressed images because pictures generate the most public support.', fx:{dt:-10,tm:-15}, g:0, fb:'Bandwidth misallocation. One raw image could monopolize the link for a very long time, starving other instruments.' } ] } ] },
+{ t:'Interstellar Thruster Swap', real:'Inspired by Voyager 1 (2017)', des:'INTERSTELLAR MISSION // ATTITUDE DEGRADATION',
+  s:'Voyager 1 is about 13 billion miles from Earth. Its attitude thrusters have degraded after billions of pulses, and the antenna cannot stay pointed at Earth without intervention.',
+  steps:[
+  { q:'The primary attitude thrusters are failing. What is the contingency?', o:[
+    { t:'Fire the Trajectory Correction Maneuver (TCM) thrusters, dormant since the Saturn flyby 37 years ago.', fx:{hl:15,dt:15,pw:-10}, g:1, fb:'Success! Engineers dug through decades-old documentation and the backup thrusters worked, extending Voyager’s life by years.' },
+    { t:'Spin-stabilize the spacecraft using solar radiation pressure.', fx:{hl:-35,dt:-30}, g:0, fb:'Physics failure. Far from the Sun, radiation pressure is negligible and attitude lock would be lost.' },
+    { t:'Keep lengthening the pulse duration on the degraded primary thrusters.', fx:{hl:-40,pw:-20}, g:0, fb:'Mechanical blowout. Aged thrusters were already degraded; forcing longer pulses risks permanent damage.' } ] },
+  { q:'Heating the dormant thrusters costs power, and the RTG output declines every year. How do you balance power?', o:[
+    { t:'Switch off heaters for non-vital systems and instruments after modeling the thermal effects.', fx:{pw:10,tm:10}, g:1, fb:'Calculated trade. Engineers modeled heat flow across the bus to safely free up power.' },
+    { t:'Power down the receiver to save wattage.', fx:{dt:-50,hl:-10}, g:0, fb:'Fatal. Without the receiver, Earth could never command the probe again.' },
+    { t:'Fire the thrusters cold without pre-heating.', fx:{hl:-30,pw:5}, g:0, fb:'Hazard. Cold propellant lines and valves risk freezing and damaged seals.' } ] } ] },
+{ t:'Seven Minutes of Terror', real:'Inspired by Curiosity (2012)', des:'MARS ENTRY // POWERED DESCENT & SKY CRANE',
+  s:'A ~900 kg rover enters the Martian atmosphere at about 13,000 mph. The air is too thin for parachutes alone and too thick to ignore. One-way signal delay to Earth is over 10 minutes.',
+  steps:[
+  { q:'Ballistic entry causes large landing dispersion. How do you land precisely in Gale Crater?', o:[
+    { t:'Use guided entry with ejected ballast masses to generate lift and steer through gusts.', fx:{hl:15,tm:10,dt:5}, g:1, fb:'State of the art. Curiosity flew a guided path through the thin air, shrinking the landing ellipse dramatically.' },
+    { t:'Rely on a standard unguided ballistic entry and hope wind shear is minimal.', fx:{hl:-25,tm:-20}, g:0, fb:'Out of tolerance. Unguided landing error spans many kilometers, risking cliffs and boulder fields.' },
+    { t:'Transmit real-time telemetry to Earth and pause descent for confirmation commands.', fx:{tm:-40,hl:-40}, g:0, fb:'Latency error. By the time Earth hears the first packet, the vehicle has already landed or crashed.' } ] },
+  { q:'Terminal descent: the rover is too heavy for airbags. How do you touch down safely?', o:[
+    { t:'Sky Crane: lower the rover on bridles beneath rocket thrusters, then cut the cords.', fx:{hl:20,pw:10,dt:10}, g:1, fb:'Audacious and flawless. The Sky Crane kept the rover clear of thruster plume and dust, landing it gently on its wheels.' },
+    { t:'Encase the 1-ton rover in giant airbags like Mars Pathfinder.', fx:{hl:-50,pw:-20}, g:0, fb:'Mass scaling limit. Airbag mass grows too fast with vehicle weight; a rover this size is not practical to bounce.' },
+    { t:'Land directly on rocket engines attached to the rover belly.', fx:{hl:-35,dt:-20}, g:0, fb:'Contamination. Exhaust kicking up dust would harm cameras and sample inlets.' } ] } ] }
+];
+
+const BOARD = [
+{ who:'Dr. Aris Thorne', role:'Chief Communications Systems Architect', av:'COM',
+  q:'“Your radar generates 48 Gb of raw data per sol. Your S-band downlink can only push 6 Gb/day through the Deep Space Network. Why shouldn’t this board reject your payload now?”', o:[
+  { t:'“We process onboard to extract radar products, buffer raw blocks on solid-state recorders, and duty-cycle across orbital passes.”', p:2, fb:'Exceptional. You identified the data-rate bottleneck, offered onboard reduction, and gave a realistic duty-cycle concept.' },
+  { t:'“We will request dedicated 24-hour DSN 70-meter coverage to send all uncompressed data.”', p:0, fb:'Unrealistic. The DSN is an over-subscribed asset shared by many missions; you would never get that.' },
+  { t:'“We can raise our transmitter power to 500 Watts to push data faster.”', p:1, fb:'Marginal. More RF power hits thermal and solar-array limits without fixing the underlying link constraints.' } ] },
+{ who:'Elena Rostova', role:'Lead Power & Thermal Subsystems Engineer', av:'PWR',
+  q:'“Mars gets under half the sunlight Earth does. Your bus demands 350 W during radar runs, but your panels produce only 210 W at aphelion. How does this craft survive?”', o:[
+  { t:'“Instruments run on a staggered duty cycle, only during favorable passes, with batteries sized for peak load and recharged between runs.”', p:2, fb:'Flawless. Instruments rarely need peak power simultaneously; sizing batteries for peaks and cycling prevents bus collapse.' },
+  { t:'“We will install massive oversized solar panels to deliver 500 W in all conditions.”', p:0, fb:'Severe penalty. Huge arrays add mass and inertia, straining the launch fairing and attitude control.' },
+  { t:'“We will turn off thermal heaters and rely on waste heat from electronics.”', p:1, fb:'Dangerous gamble. Eclipse temperatures are extremely cold and batteries can be damaged below their limits.' } ] },
+{ who:'Marcus Brody', role:'Flight Dynamics & Trajectory Lead', av:'NAV',
+  q:'“You chose direct propulsive Mars orbit insertion (1,200 m/s delta-v), consuming 58% of launch mass as propellant. Why did you discard aerobraking?”', o:[
+  { t:'“Aerobraking takes months of passes through variable atmosphere with thermal stress; a direct burn secures orbit immediately with verified propellant margins.”', p:2, fb:'Masterful trade study. Aerobraking saves propellant but costs schedule, thermal risk, and exposure to atmospheric variability.' },
+  { t:'“Propulsion is always better than aerodynamics because space is a vacuum.”', p:0, fb:'Ignorant response. Mars has an atmosphere that past orbiters used successfully for orbit shaping.' },
+  { t:'“We can do both at once without calculating thermal flux.”', p:0, fb:'Instant rejection. Flight dynamics needs deterministic corridors; untested hybrids invite mission loss.' } ] },
+{ who:'Director Sarah Jenkins', role:'Mission Assurance & Program Budget Director', av:'DIR',
+  q:'“Your design carries a slim 3.2% mass margin and zero cost reserve for Phase D testing. Why should Headquarters greenlight this mission?”', o:[
+  { t:'“We de-scope the secondary spectrometer to backup status, freeing mass margin, and hold a funded cost reserve per standard guidelines.”', p:2, fb:'The mark of a true Mission Architect. Margin and reserves are the cheapest insurance against failure.' },
+  { t:'“Our mass is exact in CAD, so margin is an inefficient luxury.”', p:0, fb:'Fatal. Spacecraft mass routinely grows significantly between design review and integration. Zero margin guarantees trouble.' },
+  { t:'“We will ask Congress for supplementary funding if testing reveals mass growth.”', p:0, fb:'Program cancellation risk. Unhedged cost growth is a leading reason missions get cancelled.' } ] }
+];
+
+/* ---------- State & storage ---------- */
+let st = { m:{}, si:0, step:0, best:0, total:0, ri:0, rp:0 };
+const KEY = 'nasa_mission_architect_data';
+const getLogs = () => {
+  try { return Object.assign({ rescues:0, reviews:0, highScore:0 }, JSON.parse(localStorage.getItem(KEY))); }
+  catch (e) { return { rescues:0, reviews:0, highScore:0 }; }
+};
+const addLog = (k, v) => {
+  const d = getLogs();
+  d[k] = k === 'highScore' ? Math.max(d.highScore, v) : d[k] + v;
+  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {}
+};
+
+/* ---------- Helpers ---------- */
+const app = document.getElementById('app');
+const $ = id => document.getElementById(id);
+const on = (id, fn) => { const el = $(id); if (el) el.onclick = () => { audio.init(); fn(); }; };
+
+function gauge(k) {
+  const v = Math.max(0, Math.min(100, st.m[k]));
+  const c = v < 25 ? 'crit' : v < 45 ? 'warn' : '';
+  return `<div class="gauge ${c}"><div class="gh"><span class="gl">${MET[k].icon} ${MET[k].name}</span><span class="gv">${Math.round(v)}%</span></div><div class="barbg"><div class="bar ${c}" style="width:${v}%"></div></div></div>`;
+}
+const gauges = () => Object.keys(MET).map(gauge).join('');
+const depleted = () => Object.keys(MET).find(k => st.m[k] <= 0) || null;
+
+/* ---------- Home ---------- */
+function home() {
+  const l = getLogs();
+  app.innerHTML = `
+  <div class="hud"><span>FLIGHT STATUS: STANDBY</span><span>ARCHIVED: ${l.rescues} RESCUES · ${l.reviews} REVIEWS</span></div>
+  <h1>Mission Architect</h1>
+  <p class="lead">Step into the shoes of a NASA Flight Director and Chief Systems Engineer. Learn spacecraft design principles by solving real spaceflight crises and defending a deep-space architecture before a review board.</p>
+  <div class="modes">
+    <button class="mode" id="m1"><div><span class="tag"><span class="dot" style="background:var(--ok)"></span>Mode 1 · Real Operations</span><h2>Crisis Management</h2><p class="lead" style="font-size:14px">Five real emergencies: Apollo 13, Hubble, Galileo, Voyager 1 and Curiosity. Balance Power, Comms, Timeline and Vehicle Health.</p></div><span class="btn">ENTER FLIGHT OPS</span></button>
+    <button class="mode" id="m2"><div><span class="tag"><span class="dot" style="background:var(--warn)"></span>Mode 2 · Systems Engineering</span><h2>The Review Board</h2><p class="lead" style="font-size:14px">Defend a Mars orbiter architecture against 4 skeptical domain chiefs. Justify power, link budget and reserves.</p></div><span class="btn">FACE THE BOARD</span></button>
+  </div>
+  <div class="card" style="margin-top:20px"><span class="tag">Core Principles of Spaceflight Architecture</span><ul class="list">
+    <li><span><strong>Margin is cheap insurance:</strong> mass, power and bandwidth almost always get worse. Never design to the zero boundary.</span></li>
+    <li><span><strong>Protect the bus before fixing the fault:</strong> isolate cascading power failures before diagnostic tinkering.</span></li>
+    <li><span><strong>Bandwidth triage:</strong> when links degrade, send compressed high-value science first.</span></li></ul></div>`;
+  on('m1', () => { audio.quindar(true); startRescue(); });
+  on('m2', () => { audio.quindar(true); startBoard(); });
+}
+
+/* ---------- Mode 1 ---------- */
+function startRescue() {
+  st = { m:{ pw:START, dt:START, tm:START, hl:START }, si:0, step:0, best:0, ri:0, rp:0,
+         total: SCENARIOS.reduce((n, s) => n + s.steps.length, 0) };
+  rescue();
+}
+
+function rescue() {
+  const sc = SCENARIOS[st.si], step = sc.steps[st.step];
+  app.innerHTML = `
+  <div class="hud"><span>CRISIS ${st.si + 1} OF ${SCENARIOS.length} · STEP ${st.step + 1}/${sc.steps.length}</span><span>${sc.des}</span></div>
+  <span class="tag"><span class="dot" style="background:var(--bad)"></span>${sc.real}</span>
+  <h1>${sc.t}</h1>
+  <p class="lead">${sc.s}</p>
+  <div class="grid4" id="gauges">${gauges()}</div>
+  <div class="card"><div style="font-size:16px;font-weight:600;margin-bottom:14px">${step.q}</div>
+    <div>${step.o.map((o, i) => `<button class="choice" data-choice="${i}"><span class="key">${i + 1}</span><span>${o.t}</span></button>`).join('')}</div>
+    <div id="fb"></div></div>`;
+  const btns = app.querySelectorAll('[data-choice]');
+  btns.forEach(b => b.onclick = () => { audio.init(); decide(+b.dataset.choice, btns); });
+}
+
+function decide(i, btns) {
+  const sc = SCENARIOS[st.si], c = sc.steps[st.step].o[i];
+  btns.forEach((b, j) => { b.disabled = true; if (j === i) b.classList.add('selected'); });
+  const chips = Object.entries(c.fx).map(([k, d]) => {
+    st.m[k] = Math.min(100, st.m[k] + d);
+    return `<span class="chip ${d > 0 ? 'pos' : 'neg'}">${MET[k].name} ${d > 0 ? '+' : ''}${d}%</span>`;
+  }).join('');
+  if (c.g) { st.best++; audio.chime(); } else audio.alarm();
+  const dead = depleted();
+  if (dead) audio.failure();
+  const last = st.step + 1 >= sc.steps.length && st.si + 1 >= SCENARIOS.length;
+  $('gauges').innerHTML = gauges();
+  $('fb').innerHTML = `<div class="fb ${c.g ? 'good' : 'bad'}"><div class="ft">${c.g ? '✓ Optimal systems resolution' : '⚠ Suboptimal trade-off'}</div><div>${c.fb}</div><div class="chips">${chips}</div></div>
+    <button class="btn" id="next">${dead ? 'CRITICAL SUBSYSTEM FAILURE // SEE DEBRIEF' : last ? 'COMPLETE ALL MISSIONS' : 'PROCEED TO NEXT FLIGHT EVENT →'}</button>`;
+  $('next').focus();
+  on('next', () => {
+    audio.click();
+    if (dead) return rescueDebrief(dead);
+    if (++st.step >= sc.steps.length) { st.step = 0; st.si++; }
+    st.si >= SCENARIOS.length ? rescueDebrief(null) : rescue();
+  });
+}
+
+function rescueDebrief(failed) {
+  const avg = Object.keys(MET).reduce((a, k) => a + Math.max(0, st.m[k]), 0) / 4;
+  const score = Math.min(100, Math.round(avg * (failed ? .4 : .6) + st.best * 4));
+  addLog('rescues', 1); addLog('highScore', score);
+  let rank = 'MISSION APPRENTICE';
+  if (!failed) rank = score >= 85 ? 'LEGENDARY FLIGHT DIRECTOR' : score >= 65 ? 'SENIOR LEAD SYSTEMS ENGINEER' : 'CERTIFIED CAPCOM CONTROLLER';
+  const col = failed ? 'var(--bad)' : 'var(--ok)';
+  app.innerHTML = `
+  <div class="hud"><span>POST-FLIGHT OPERATIONS REPORT</span><span>${failed ? 'VEHICLE COMPROMISED' : 'MISSION ACCOMPLISHED'}</span></div>
+  <div class="card hero"><span class="tag">${failed ? 'Critical subsystem loss' : 'Flight operations success'}</span>
+    <div class="big" style="color:${col}">${score}<span style="font-size:22px;color:var(--mut)">/100</span></div>
+    <div class="rate">${rank}</div>
+    <p style="color:var(--mut);font-size:14px;margin-top:6px">Optimal decisions: <strong>${st.best} of ${st.total}</strong></p></div>
+  <div class="card"><h2>${failed ? 'Catastrophic Loss Analysis' : 'Mission Operations Debrief'}</h2>
+    <p class="lead">${failed ? `Your spacecraft ran out of margin on <strong>${MET[failed].name}</strong>. In real operations, running any consumable or bus to zero removes all redundancy.` : 'You balanced complex trade-offs across five landmark NASA emergencies and kept crews and payloads intact.'}</p>
+    <span class="tag">Flight Director Takeaways</span>
+    <ul class="list">
+      <li><span><strong>Redundancy saves lives:</strong> the Apollo 13 Lunar Module and Galileo’s low-gain antenna weren’t designed for those crises, yet cross-strapping saved both.</span></li>
+      <li><span><strong>Software is your cheapest mechanic:</strong> when hardware breaks far away, algorithms and uplinked patches do the work.</span></li>
+      <li><span><strong>Physics dictates reality:</strong> latency, thermal limits and propellant mass can’t be wished away.</span></li></ul>
+    <div class="pair"><button class="btn" id="again">RETRY CRISIS OPS</button><button class="btn sec" id="menu">MAIN MENU</button></div></div>`;
+  on('again', () => { audio.quindar(true); startRescue(); });
+  on('menu', () => { audio.click(); home(); });
+}
+
+/* ---------- Mode 2 ---------- */
+function startBoard() { st.ri = 0; st.rp = 0; board(); }
+
+function board() {
+  const r = BOARD[st.ri];
+  app.innerHTML = `
+  <div class="hud"><span>DESIGN REVIEW ${st.ri + 1} OF ${BOARD.length}</span><span>NASA HQ // PHASE B MILESTONE</span></div>
+  <span class="tag"><span class="dot" style="background:var(--warn)"></span>Deep Space Proposal Defense</span>
+  <h1>The Review Board</h1>
+  <p class="lead">Defend your <strong>Mars Multi-Spectral Surveyor</strong> before the standing review board. Reviewers demand quantified margin justification.</p>
+  <div class="hud"><span><strong>BASELINE:</strong> Mars orbiter · SAR + spectrometer · 350 W peak · S-band DSN link (6 Gb/day) · direct MOI · 3.2% mass margin</span></div>
+  <div class="card"><div class="who"><div class="av">${r.av}</div><div><h3 style="font-size:15px">${r.who}</h3><span style="font-size:12px;color:var(--mut)">${r.role}</span></div></div>
+    <div style="font-size:15.5px;font-style:italic;margin:12px 0 16px;color:var(--cy)">${r.q}</div>
+    <div>${r.o.map((o, i) => `<button class="choice" data-choice="${i}"><span class="key">${i + 1}</span><span>${o.t}</span></button>`).join('')}</div>
+    <div id="fb"></div></div>`;
+  const btns = app.querySelectorAll('[data-choice]');
+  btns.forEach(b => b.onclick = () => { audio.init(); answer(+b.dataset.choice, btns); });
+}
+
+function answer(i, btns) {
+  const c = BOARD[st.ri].o[i];
+  st.rp += c.p;
+  if (c.p === 2) audio.chime(); else if (c.p === 1) audio.quindar(false); else audio.alarm();
+  btns.forEach((b, j) => { b.disabled = true; if (j === i) b.classList.add('selected'); });
+  const k = c.p === 2 ? 'good' : c.p === 1 ? '' : 'bad';
+  const title = c.p === 2 ? '✓ Review board commendation' : c.p === 1 ? '⚠ Provisional pass with action items' : '✕ Objection sustained';
+  const chip = c.p === 2 ? 'pos' : c.p === 1 ? 'mid' : 'neg';
+  $('fb').innerHTML = `<div class="fb ${k}"><div class="ft">${title}</div><div>${c.fb}</div><div class="chips"><span class="chip ${chip}">Board score: +${c.p} pts</span></div></div>
+    <button class="btn" id="next">${st.ri + 1 >= BOARD.length ? 'CALCULATE BOARD VERDICT →' : 'NEXT REVIEWER →'}</button>`;
+  $('next').focus();
+  on('next', () => { audio.click(); ++st.ri >= BOARD.length ? boardResults() : board(); });
+}
+
+function boardResults() {
+  const max = BOARD.length * 2, p = st.rp;
+  addLog('reviews', 1);
+  const [status, col, head] = p >= 7 ? ['FULL FLIGHT APPROVAL (PHASE C/D)', 'var(--ok)', 'Board approves the design']
+    : p >= 4 ? ['APPROVED WITH MAJOR CONDITIONS', 'var(--warn)', 'Approved subject to delta reviews']
+    : ['MISSION REJECTED', 'var(--bad)', 'Proposal returned to the drawing board'];
+  const msg = p >= 7 ? 'You showed the gold standard of systems engineering: duty cycles, de-scope options and quantified reserves.'
+    : p >= 4 ? 'You survived the board, but several answers needed caveats. Optimistic assumptions without reserves leave the mission vulnerable.'
+    : 'The board rejected your design. When reviewers highlight a gap, quantify it and present concrete engineering levers.';
+  app.innerHTML = `
+  <div class="hud"><span>FINAL MISSION READINESS RATING</span><span>SCORE: ${p} / ${max}</span></div>
+  <div class="card hero"><span class="tag" style="color:${col}">${status}</span><div class="big" style="color:${col}">${p}<span style="font-size:22px;color:var(--mut)">/${max}</span></div><div class="rate">${head}</div></div>
+  <div class="card"><h2>Systems Engineering Evaluation</h2><p class="lead">${msg}</p>
+    <span class="tag">Key Principles for Phase Reviews</span><ul class="list">
+      <li><span><strong>Quantify the bottleneck:</strong> don’t say “it will be fine”; say how big the gap is and how you close it.</span></li>
+      <li><span><strong>Margin is not wasted mass:</strong> a design with no margin gets cancelled when the real hardware is built.</span></li>
+      <li><span><strong>Plan de-scope options early:</strong> know which instrument can go to protect the core mission.</span></li></ul>
+    <div class="pair"><button class="btn" id="again">DEFEND AGAIN</button><button class="btn sec" id="menu">MAIN MENU</button></div></div>`;
+  on('again', () => { audio.quindar(true); startBoard(); });
+  on('menu', () => { audio.click(); home(); });
+}
+
+/* ---------- Logs ---------- */
+function logs() {
+  const l = getLogs();
+  const g = (a, b) => `<div class="gauge"><div class="gh"><span class="gl">${a}</span><span class="gv">${b}</span></div></div>`;
+  app.innerHTML = `
+  <div class="hud"><span>FLIGHT RECORDS ARCHIVE</span><span>MISSION LOGBOOK</span></div>
+  <h1>Flight Logs</h1><p class="lead">Your records and the engineering lessons behind each case study.</p>
+  <div class="grid4">${g('Rescues', l.rescues)}${g('Reviews', l.reviews)}${g('Top score', l.highScore)}${g('Rank', l.highScore >= 85 ? 'FLT DIR' : l.highScore ? 'CERTIFIED' : '—')}</div>
+  <div class="card"><span class="tag">Historical Case Studies</span>
+    <h3 style="margin:10px 0 4px">1. Apollo 13 (1970)</h3><p class="lead" style="font-size:13.5px;margin-bottom:12px">Subsystem cross-strapping: surviving modules took over propulsion, life support and navigation from dead ones.</p>
+    <h3 style="margin-bottom:4px">2. Hubble Space Telescope (1990)</h3><p class="lead" style="font-size:13.5px;margin-bottom:12px">On-orbit servicing: COSTAR showed an optical flaw can be fixed after launch if servicing interfaces are designed in.</p>
+    <h3 style="margin-bottom:4px">3. Galileo (1991) &amp; Voyager 1 (2017)</h3><p class="lead" style="font-size:13.5px;margin-bottom:12px">Software compression and repurposed backup thrusters preserved science across billions of miles.</p>
+    <h3 style="margin-bottom:4px">4. Curiosity (2012)</h3><p class="lead" style="font-size:13.5px;margin-bottom:12px">Guided entry and the Sky Crane enabled a precise landing for a heavy rover.</p>
+    <button class="btn" id="back">RETURN TO MENU</button></div>`;
+  on('back', () => { audio.click(); home(); });
+}
+
+/* ---------- Global controls ---------- */
+const root = document.documentElement;
+try { if (window.matchMedia('(prefers-color-scheme: light)').matches) root.dataset.theme = 'light'; } catch (e) {}
+on('bTheme', () => { audio.click(); root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light'; });
+on('bAudio', () => {
+  audio.on = !audio.on;
+  $('bAudio').textContent = audio.on ? '🔊 COMMS ON' : '🔇 MUTED';
+  if (audio.on) audio.quindar(true);
+});
+on('home', () => { audio.click(); home(); });
+on('bLogs', () => { audio.click(); logs(); });
+
+window.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (['1', '2', '3'].includes(e.key)) {
+    const b = document.querySelector(`[data-choice="${+e.key - 1}"]:not(:disabled)`);
+    if (b) b.click();
+  }
+});
+
+home();
+</script>
+</body>
+</html>
